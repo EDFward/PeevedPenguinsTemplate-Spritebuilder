@@ -43,7 +43,7 @@
                               anchorA:ccp(0, 0)
                               anchorB:ccp(34, 138)
                            restLength:0.f
-                            stiffness:300.f
+                            stiffness:3000.f
                               damping:150.f];
   }
 }
