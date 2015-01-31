@@ -18,7 +18,6 @@
 
 - (void)didLoadFromCCB {
   self.physicsBody.collisionType = @"seal";
-  CCLOG(@"added collisiton type of seal to Seal");
 }
 
 @end
