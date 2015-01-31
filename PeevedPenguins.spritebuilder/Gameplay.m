@@ -22,6 +22,11 @@
   CCPhysicsJoint *_penguinCatapultJoint;
 }
 
+- (void)retry {
+  [[CCDirector sharedDirector]
+   replaceScene:[CCBReader loadAsScene:@"Gameplay"]];
+}
+
 - (void)didLoadFromCCB {
   self.userInteractionEnabled = TRUE;
   CCScene *level = [CCBReader loadAsScene:@"Levels/Level1"];
@@ -33,7 +38,12 @@
   _pullbackNode.physicsBody.collisionMask = @[];
 
   _mouseJointNode.physicsBody.collisionMask = @[];
+
+  _physicsNode.collisionDelegate = self;
 }
+
+# pragma mark -
+# pragma mark Touch
 
 - (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
   CGPoint touchLocation = [touch locationInNode:_contentNode];
@@ -77,6 +87,9 @@
   [self releaseCatapult];
 }
 
+# pragma mark -
+# pragma mark Physics
+
 - (void)releaseCatapult {
   if (_mouseJoint != nil) {
     [_mouseJoint invalidate];
@@ -109,9 +122,10 @@
   [_contentNode runAction:follow];
 }
 
-- (void)retry {
-  [[CCDirector sharedDirector]
-      replaceScene:[CCBReader loadAsScene:@"Gameplay"]];
+- (void)ccPhysicsCollisionPostSolve:(CCPhysicsCollisionPair *)pair
+                               seal:(CCNode *)nodeA
+                           wildcard:(CCNode *)nodeB {
+  CCLOG(@"something collided with a seal!");
 }
 
 @end
