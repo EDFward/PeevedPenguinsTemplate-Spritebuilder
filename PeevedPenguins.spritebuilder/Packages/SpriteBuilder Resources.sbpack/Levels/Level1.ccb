@@ -1389,7 +1389,7 @@
 					<key>collisionMask</key>
 					<array/>
 					<key>collisionType</key>
-					<string>seal</string>
+					<string></string>
 					<key>cornerRadius</key>
 					<real>13</real>
 					<key>density</key>
