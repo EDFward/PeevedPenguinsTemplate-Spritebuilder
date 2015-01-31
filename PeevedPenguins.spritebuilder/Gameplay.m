@@ -14,6 +14,9 @@
   CCNode *_levelNode;
   CCNode *_contentNode;
   CCNode *_pullbackNode;
+  
+  CCNode *_mouseJointNode;
+  CCPhysicsJoint *_mouseJoint;
 }
 
 - (void)didLoadFromCCB {
@@ -25,6 +28,8 @@
   _physicsNode.debugDraw = TRUE;
   
   _pullbackNode.physicsBody.collisionMask = @[];
+  
+  _mouseJointNode.physicsBody.collisionMask = @[];
 }
 
 - (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
