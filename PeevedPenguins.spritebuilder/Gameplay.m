@@ -7,7 +7,10 @@
 //
 
 #import "Gameplay.h"
+#import "Penguin.h"
 #import "CCPhysics+ObjectiveChipmunk.h"
+
+static const float MIN_SPEED = 5.f;
 
 @implementation Gameplay {
   CCPhysicsNode *_physicsNode;
@@ -19,13 +22,49 @@
   CCNode *_mouseJointNode;
   CCPhysicsJoint *_mouseJoint;
 
-  CCNode *_currentPenguin;
+  Penguin *_currentPenguin;
   CCPhysicsJoint *_penguinCatapultJoint;
+
+  CCAction *_followPenguin;
+}
+
+- (void)update:(CCTime)delta {
+  // return if no penguin is launched
+  if (!_currentPenguin.launched)
+    return;
+  
+  if (ccpLength(_currentPenguin.physicsBody.velocity) < MIN_SPEED) {
+    [self nextAttempt];
+    return;
+  }
+
+  int xMin = _currentPenguin.boundingBox.origin.x;
+
+  if (xMin < self.boundingBox.origin.x) {
+    [self nextAttempt];
+    return;
+  }
+
+  int xMax = xMin + _currentPenguin.boundingBox.size.width;
+
+  if (xMax > self.boundingBox.origin.x + self.boundingBox.size.width) {
+    [self nextAttempt];
+    return;
+  }
+}
+
+- (void)nextAttempt {
+  _currentPenguin = nil;
+  [_contentNode stopAction:_followPenguin];
+
+  CCActionMoveTo *actionMoveTo =
+      [CCActionMoveTo actionWithDuration:1.f position:ccp(0, 0)];
+  [_contentNode runAction:actionMoveTo];
 }
 
 - (void)retry {
   [[CCDirector sharedDirector]
-   replaceScene:[CCBReader loadAsScene:@"Gameplay"]];
+      replaceScene:[CCBReader loadAsScene:@"Gameplay"]];
 }
 
 - (void)didLoadFromCCB {
@@ -43,8 +82,8 @@
   _physicsNode.collisionDelegate = self;
 }
 
-# pragma mark -
-# pragma mark Touch
+#pragma mark -
+#pragma mark Touch
 
 - (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
   CGPoint touchLocation = [touch locationInNode:_contentNode];
@@ -60,7 +99,7 @@
                             stiffness:3000.f
                               damping:150.f];
 
-    _currentPenguin = [CCBReader load:@"Penguin"];
+    _currentPenguin = (Penguin*)[CCBReader load:@"Penguin"];
     CGPoint penguinPosition = [_catapultArm convertToWorldSpace:ccp(50, 140)];
     _currentPenguin.position =
         [_physicsNode convertToNodeSpace:penguinPosition];
@@ -88,8 +127,8 @@
   [self releaseCatapult];
 }
 
-# pragma mark -
-# pragma mark Physics
+#pragma mark -
+#pragma mark Physics
 
 - (void)releaseCatapult {
   if (_mouseJoint != nil) {
@@ -101,9 +140,11 @@
 
     _currentPenguin.physicsBody.allowsRotation = TRUE;
 
-    CCActionFollow *follow = [CCActionFollow actionWithTarget:_currentPenguin
-                                                worldBoundary:self.boundingBox];
-    [_contentNode runAction:follow];
+    _followPenguin = [CCActionFollow actionWithTarget:_currentPenguin
+                                        worldBoundary:self.boundingBox];
+    [_contentNode runAction:_followPenguin];
+    
+    _currentPenguin.launched = TRUE;
   }
 }
 
@@ -127,7 +168,7 @@
                                seal:(CCNode *)nodeA
                            wildcard:(CCNode *)nodeB {
   float energy = [pair totalKineticEnergy];
-  
+
   if (energy > 5000.f) {
     [[_physicsNode space] addPostStepBlock:^{
       [self sealRemoved:nodeA];
@@ -136,11 +177,12 @@
 }
 
 - (void)sealRemoved:(CCNode *)seal {
-  CCParticleSystem *explosion = (CCParticleSystem *)[CCBReader load:@"SealExplosion"];
+  CCParticleSystem *explosion =
+      (CCParticleSystem *)[CCBReader load:@"SealExplosion"];
   explosion.autoRemoveOnFinish = TRUE;
   explosion.position = seal.position;
   [seal.parent addChild:explosion];
-  
+
   [seal removeFromParent];
 }
 
