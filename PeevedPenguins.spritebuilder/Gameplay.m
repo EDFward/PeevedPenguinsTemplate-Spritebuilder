@@ -14,10 +14,10 @@
   CCNode *_levelNode;
 }
 
-- (void)didLoadFromCCB{
+- (void)didLoadFromCCB {
   self.userInteractionEnabled = TRUE;
   CCScene *level = [CCBReader loadAsScene:@"Levels/Level1"];
-  [_levelNode addChild: level];
+  [_levelNode addChild:level];
 }
 
 - (void)touchBegan:(CCTouch *)touch withEvent:(CCTouchEvent *)event {
@@ -27,16 +27,22 @@
 - (void)launchPenguin {
   CCNode *penguin = [CCBReader load:@"Penguin"];
   penguin.position = ccpAdd(_catapultArm.position, ccp(16, 50));
-  
+
   [_physicsNode addChild:penguin];
-  
+
   CGPoint launchDirection = ccp(1, 0);
   CGPoint force = ccpMult(launchDirection, 8000);
   [penguin.physicsBody applyForce:force];
-  
-  self.position =ccp(0, 0);
-  CCActionFollow *follow = [CCActionFollow actionWithTarget:penguin worldBoundary:self.boundingBox];
+
+  self.position = ccp(0, 0);
+  CCActionFollow *follow =
+      [CCActionFollow actionWithTarget:penguin worldBoundary:self.boundingBox];
   [self runAction:follow];
+}
+
+- (void)retry {
+  [[CCDirector sharedDirector]
+      replaceScene:[CCBReader loadAsScene:@"Gameplay"]];
 }
 
 @end
