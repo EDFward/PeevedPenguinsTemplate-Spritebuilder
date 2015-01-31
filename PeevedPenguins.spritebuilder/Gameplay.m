@@ -50,7 +50,7 @@
                               damping:150.f];
 
     _currentPenguin = [CCBReader load:@"Penguin"];
-    CGPoint penguinPosition = [_catapultArm convertToWorldSpace:ccp(34, 183)];
+    CGPoint penguinPosition = [_catapultArm convertToWorldSpace:ccp(34, 160)];
     _currentPenguin.position =
         [_physicsNode convertToNodeSpace:penguinPosition];
 
