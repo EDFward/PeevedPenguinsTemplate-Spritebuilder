@@ -787,7 +787,7 @@
 				<key>displayName</key>
 				<string>content</string>
 				<key>memberVarAssignmentName</key>
-				<string>_content</string>
+				<string>_contentNode</string>
 				<key>memberVarAssignmentType</key>
 				<integer>1</integer>
 				<key>properties</key>
